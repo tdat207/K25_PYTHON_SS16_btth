@@ -5,24 +5,21 @@ blood_inventory = [
 ]
 
 def display_inventory(inventory):
-    # ham nay de split chuoi xong can le in ra danh sach voi tinh tong the tich
+    # ham nay dung map va lambda tinh tong the tich nang cao xong can le in bang
     if len(inventory) == 0:
         print("Kho máu hiện chưa có túi máu nào.")
     else:
         print("--- DANH SÁCH KHO MÁU ---")
         print(f"{'Mã Túi':<6} | {'Người Hiến':<16} | {'Nhóm Máu':<8} | {'Thể Tích':<8} | {'Ngày Hết Hạn'}")
         print("-" * 65)
-        total_volume = 0
+        
+        volumes = map(lambda item: int(item.split("-")[3]), inventory)
+        total_volume = sum(volumes)
+        
         for item in inventory:
             info = item.split("-")
-            code = info[0]
-            name = info[1]
-            blood_type = info[2]
-            volume = int(info[3])
-            expiry = info[4]
-            total_volume = total_volume + volume
-            print(f"{code:<6} | {name:<16} | {blood_type:<8} | {volume} ml   | {expiry}")
-        print("-" * 65)
+            print(f"{info[0]:<6} | {info[1]:<16} | {info[2]:<8} | {info[3]} ml   | {info[4]}")
+
         print("Tổng thể tích máu trong kho:", total_volume, "ml.")
 
 def add_blood_bag(inventory):
@@ -104,24 +101,21 @@ def update_expiry(inventory):
     print("Thành công: Đã cập nhật ngày hết hạn cho túi máu", code + "!")
 
 def remove_blood_bag(inventory):
-    # ham nay de tim ma tui mau va xoa khoi danh sach bang remove
+    # ham nay dung filter va lambda de loc bo ma tui mau can xoa trong mot not nhac
     print("--- XUẤT / HỦY TÚI MÁU ---")
     code = input("Nhập mã túi máu cần xuất/hủy: ").strip().upper()
     if code == "":
         print("Lỗi: Mã túi máu không được để trống!")
         return
 
-    target_item = ""
-    for item in inventory:
-        info = item.split("-")
-        if info[0] == code:
-            target_item = item
-            break
-
-    if target_item == "":
+    old_len = len(inventory)
+    filtered_inventory = list(filter(lambda item: item.split("-")[0] != code, inventory))
+    
+    if len(filtered_inventory) == old_len:
         print("Lỗi: Không tìm thấy túi máu", code, "trong kho!")
     else:
-        inventory.remove(target_item)
+        inventory.clear()
+        inventory.extend(filtered_inventory)
         print("Thành công: Đã xuất túi máu", code, "khỏi kho!")
 
 while True:
